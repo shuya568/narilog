@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    container_name: narilog-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: narilog
+    ports:
+      - "5432:5432"
+    volumes:
+      - narilog-db-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./narilog-api
+      dockerfile: Dockerfile
+    container_name: narilog-api
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/narilog?schema=public
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+
+volumes:
+  narilog-db-data:
